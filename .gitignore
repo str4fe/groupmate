@@ -1,0 +1,9 @@
+.env
+group_seed.json
+__pycache__/
+*.py[cod]
+*.db
+data/
+.venv/
+.pytest_cache/
+.ruff_cache/

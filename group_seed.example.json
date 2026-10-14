@@ -1,0 +1,21 @@
+{
+  "subjects": [
+    {"name": "Example subject", "teacher_name": "Example teacher"}
+  ],
+  "students": [
+    {
+      "telegram_id": 100000001,
+      "full_name": "Example Student",
+      "subgroup": 1,
+      "role": "student",
+      "is_active": true
+    },
+    {
+      "telegram_id": 100000002,
+      "full_name": "Example Group Representative",
+      "subgroup": 2,
+      "role": "headman",
+      "is_active": true
+    }
+  ]
+}
