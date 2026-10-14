@@ -1,3 +1,4 @@
+from datetime import date
 from functools import lru_cache
 
 from pydantic import Field
@@ -14,6 +15,8 @@ class Settings(BaseSettings):
         default="change-me-in-your-env", validation_alias="APP_SECRET_KEY"
     )
     app_name: str = Field(default="University Attendance", validation_alias="APP_NAME")
+    group_name: str = Field(default="Учебная группа", validation_alias="GROUP_NAME")
+    semester_start_date: date = Field(default=date(2026, 9, 1), validation_alias="SEMESTER_START_DATE")
     debug: bool = Field(default=False, validation_alias="DEBUG")
     debug_auth: bool = Field(default=False, validation_alias="DEBUG_AUTH")
 
