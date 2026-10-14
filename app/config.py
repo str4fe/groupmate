@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     bot_token: str = Field(default="", validation_alias="BOT_TOKEN")
+    webapp_url: str = Field(default="http://localhost:8000", validation_alias="WEBAPP_URL")
     database_url: str = Field(
         default="sqlite+aiosqlite:///./data/app.db", validation_alias="DATABASE_URL"
     )
