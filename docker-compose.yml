@@ -8,8 +8,11 @@ services:
       APP_SECRET_KEY: ${APP_SECRET_KEY:-change-me-in-your-env}
       APP_NAME: ${APP_NAME:-University Attendance}
       DEBUG: ${DEBUG:-false}
+      DEBUG_AUTH: ${DEBUG_AUTH:-true}
     ports:
       - "${APP_PORT:-8000}:8000"
+    volumes:
+      - ./app:/app/app
     depends_on:
       db:
         condition: service_healthy

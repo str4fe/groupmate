@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     )
     app_name: str = Field(default="University Attendance", validation_alias="APP_NAME")
     debug: bool = Field(default=False, validation_alias="DEBUG")
+    debug_auth: bool = Field(default=False, validation_alias="DEBUG_AUTH")
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=False
