@@ -1,4 +1,4 @@
-# University Attendance
+# groupmate
 
 Open-source foundation for attendance and study-process management in university groups. The application uses FastAPI, SQLAlchemy 2 async, Alembic, and PostgreSQL; SQLite is available for local development.
 
