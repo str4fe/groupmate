@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+group_seed.json
+*.xlsx
+data/
+*.log

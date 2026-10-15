@@ -1,3 +1,10 @@
+FROM node:22-alpine AS frontend-builder
+WORKDIR /frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend ./
+RUN npm run build
+
 FROM python:3.12-slim AS builder
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PIP_NO_CACHE_DIR=1
 WORKDIR /build
@@ -13,6 +20,7 @@ COPY --from=builder /install /usr/local
 COPY app ./app
 COPY migrations ./migrations
 COPY alembic.ini ./
+COPY --from=frontend-builder /frontend/dist ./frontend/dist
 RUN mkdir -p /app/data && chown -R app:app /app
 USER app
 EXPOSE 8000

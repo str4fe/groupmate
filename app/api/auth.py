@@ -25,6 +25,7 @@ async def _find_active_user(session: AsyncSession, telegram_id: int) -> User:
 
 
 @router.post("/telegram", response_model=TokenPair)
+@router.post("/telegram-webapp", response_model=TokenPair)
 async def telegram_login(body: TelegramLoginRequest, session: Session) -> TokenPair:
     try:
         telegram_user = validate_init_data(body.init_data)

@@ -9,6 +9,7 @@ services:
       APP_NAME: ${APP_NAME:-University Attendance}
       DEBUG: ${DEBUG:-false}
       DEBUG_AUTH: ${DEBUG_AUTH:-true}
+      SCHEDULE_SLOT_TIMES: '${SCHEDULE_SLOT_TIMES:-{}}'
     ports:
       - "${APP_PORT:-8000}:8000"
     volumes:

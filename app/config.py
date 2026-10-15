@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     semester_start_date: date = Field(default=date(2026, 9, 1), validation_alias="SEMESTER_START_DATE")
     debug: bool = Field(default=False, validation_alias="DEBUG")
     debug_auth: bool = Field(default=False, validation_alias="DEBUG_AUTH")
+    # Optional JSON mapping such as {"1": ["08:30", "10:05"]}.
+    schedule_slot_times: dict[str, list[str]] = Field(
+        default_factory=dict, validation_alias="SCHEDULE_SLOT_TIMES"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore", case_sensitive=False

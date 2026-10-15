@@ -13,7 +13,7 @@ from sqlalchemy.orm import selectinload
 from app.api.deps import get_current_user, require_role
 from app.config import get_settings
 from app.db import get_session
-from app.models import Lesson, LessonStatus, Subject, User, UserRole
+from app.models import Lesson, LessonStatus, Parity, ScheduleSlot, Subject, User, UserRole
 from app.services.schedule import lessons_for_date
 
 router = APIRouter(tags=["lessons"])
@@ -28,24 +28,39 @@ class LessonOut(BaseModel):
     id: int
     date: Date
     slot_number: int
+    time_start: str | None
+    time_end: str | None
+    lesson_type: str | None
     subject_id: int
     subject_name: str
     subgroup: int
     status: LessonStatus
 
 
-def lesson_out(lesson: Lesson) -> LessonOut:
+def lesson_out(lesson: Lesson, schedule_slot: ScheduleSlot | None = None) -> LessonOut:
+    times = get_settings().schedule_slot_times.get(str(lesson.slot_number), [])
     return LessonOut(
         id=lesson.id, date=lesson.date, slot_number=lesson.slot_number,
         subject_id=lesson.subject_id, subject_name=lesson.subject.name,
         subgroup=lesson.subgroup, status=lesson.status,
+        time_start=times[0] if len(times) > 0 else None,
+        time_end=times[1] if len(times) > 1 else None,
+        lesson_type=schedule_slot.lesson_type.value if schedule_slot is not None else None,
     )
 
 
 async def _get_lessons(target_date: Date, session: AsyncSession, user: User) -> list[LessonOut]:
     lessons = await lessons_for_date(session, target_date)
+    start = get_settings().semester_start_date
+    parity = Parity.EVEN if ((target_date - start).days // 7) % 2 == 0 else Parity.ODD
+    slots = (await session.scalars(select(ScheduleSlot).where(
+        ScheduleSlot.day_of_week == target_date.isoweekday(),
+        ScheduleSlot.parity.in_((Parity.ALL, parity)),
+    ))).all()
+    slot_by_key = {(slot.slot_number, slot.subject_id, slot.subgroup): slot for slot in slots}
     return [
-        lesson_out(lesson) for lesson in lessons
+        lesson_out(lesson, slot_by_key.get((lesson.slot_number, lesson.subject_id, lesson.subgroup)))
+        for lesson in lessons
         if user.role != UserRole.STUDENT or lesson.subgroup in (0, user.subgroup)
     ]
 
@@ -98,4 +113,11 @@ async def edit_lesson(body: LessonEdit, session: Session, admin: Admin) -> Lesso
     lesson = await session.scalar(
         select(Lesson).options(selectinload(Lesson.subject)).where(Lesson.id == lesson.id)
     )
-    return lesson_out(lesson)
+    start = get_settings().semester_start_date
+    parity = Parity.EVEN if ((lesson.date - start).days // 7) % 2 == 0 else Parity.ODD
+    schedule_slot = await session.scalar(select(ScheduleSlot).where(
+        ScheduleSlot.day_of_week == lesson.date.isoweekday(), ScheduleSlot.parity.in_((Parity.ALL, parity)),
+        ScheduleSlot.slot_number == lesson.slot_number, ScheduleSlot.subject_id == lesson.subject_id,
+        ScheduleSlot.subgroup == lesson.subgroup,
+    ))
+    return lesson_out(lesson, schedule_slot)

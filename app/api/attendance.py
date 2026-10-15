@@ -1,3 +1,4 @@
+from datetime import date as Date
 from datetime import datetime
 from typing import Annotated, Literal
 from zoneinfo import ZoneInfo
@@ -97,6 +98,17 @@ async def check_in(body: CheckIn, session: Session, user: CurrentUser) -> Attend
         AttendanceRecord.lesson_id == lesson.id, AttendanceRecord.user_id == user.id,
     ))
     return _out(record)
+
+
+@router.get("/attendance/me", response_model=list[AttendanceOut])
+async def my_attendance(date: Date, session: Session, user: CurrentUser) -> list[AttendanceOut]:
+    records = (await session.scalars(
+        select(AttendanceRecord)
+        .join(AttendanceRecord.lesson)
+        .where(AttendanceRecord.user_id == user.id, Lesson.date == date)
+        .order_by(Lesson.slot_number, AttendanceRecord.lesson_id)
+    )).all()
+    return [_out(record) for record in records]
 
 
 @router.get("/admin/attendance/lesson/{lesson_id}", response_model=list[StudentAttendance])
